@@ -1,132 +1,183 @@
+  
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#define Max_Entries 300 // Number of max entries that can be there
+    //Defining a set of Macros which can be reused
+#define MAX_BOOKS 100
+#define MAX_NAME_LENGTH 50
+#define MAX_AUTHOR_LENGTH 50
+#define MAX_PUBLISHER_LENGTH 50
 
-struct Book
-{
-    char name[200];
-    char author[200];
-    char donor[200];
-    char recievor[200];
+typedef struct Book { //Structure of Book
+    int id;
+    char name[MAX_NAME_LENGTH]; 
+    char author[MAX_AUTHOR_LENGTH];
+    char publisher[MAX_PUBLISHER_LENGTH];
+    int year;
+} Book;
 
-};
+Book books[MAX_BOOKS]; //Creating an array of Structs
+int num_books = 0; //Starting index of Array
 
-
-void add();
-void TestData(){
-
+void add_book() {
+    if (num_books >= MAX_BOOKS) {
+        printf("Error: Maximum number of books reached\n");
+        return;
+    }
+    Book book;
+    book.id = num_books + 1;
+    char temp[MAX_NAME_LENGTH];
+    printf("Enter book name: ");
+    fgets(temp, MAX_NAME_LENGTH, stdin);
+    temp[strcspn(temp, "\n")] = '\0'; // Remove trailing space! ultra imp change or else \n would be considered tooo!!!!
+    strcpy(book.name, temp);
+    printf("Enter author name: ");
+    fgets(temp, MAX_NAME_LENGTH, stdin);
+    temp[strcspn(temp, "\n")] = '\0'; // Remove trailing space! ultra imp change or else \n would be considered tooo!!!!
+    strcpy(book.author, temp);
+    printf("Enter publisher name: ");
+    fgets(temp, MAX_NAME_LENGTH, stdin);
+    temp[strcspn(temp, "\n")] = '\0'; // Remove trailing space! ultra imp change or else \n would be considered tooo!!!!
+    strcpy(book.publisher, temp);
+    printf("Enter year of publication: ");
+    scanf("%d", &book.year);
+    books[num_books] = book;
+    num_books++;
+    printf("Book added successfully\n");
 }
 
-
-int main(){
-    
-struct Book books[Max_Entries]; // A list of Book is initialized
-int index=0; //intial index
-    
-
-    while(1){ // infinite loop unless user says otherwise
-    int choice;
-    printf("Enter Your Choice:\n1. Add Record \n2. Delete Record\n3. Search Records\n4. Update Record\n5. Display All ecord\n0. Exit\n");
-    scanf("%d",&choice);
-    if(choice==0){
-        break; // Exit Mechanism
+void list_books() {
+    printf("ID\tName\tAuthor\tPublisher\tYear\n");
+    int i;
+    for (i = 0; i < num_books; i++) {
+        Book book = books[i];
+        printf("%d\t%s\t%s\t%s\t%d\n", book.id, book.name, book.author, book.publisher, book.year);
     }
-    switch(choice){
-        case 1:{
-        // We Start with initializing variables for every Field
-        char name[200];
-        char author[200];
-        char donor[200];
-        char recievor[200];
-        //Then we take input from user for every field and push them into out records
-        
-        printf("Enter name of author : ");
-        scanf("%[^\n]%*c", name);
-        name[strcspn(name, "\n")] = '\0'; // remove trailing newline character
-        printf("\n");
-        
-        printf("Enter name of author : ");
-        scanf("%[^\n]%*c", author);
-        author[strcspn(author, "\n")] = '\0'; // remove trailing newline character
-        
-        printf("Enter name of donor: ");
-        scanf("%[^\n]%*c", donor);
-        donor[strcspn(donor, "\n")] = '\0'; // remove trailing newline character
-        
-        printf("Enter name of recievor: ");
-        scanf("%[^\n]%*c", recievor);
-        recievor[strcspn(recievor, "\n")] = '\0'; // remove trailing newline character
-        
-         // push the data
-         if(index==Max_Entries){
-            printf("Max Entires Reached no more space left"); // safe check to make sure data doesn't overflow
-         }
-         else{
-            strcpy(books[index].name, name);
-            strcpy(books[index].author, author);
-            strcpy(books[index].donor, donor);
-            strcpy(books[index].recievor, recievor);
-            index++;
-         }
-        break;
-        }
+}
 
-        case 2:{
-            int i;
-            printf("Enter the index of record you want to Delete: ");
+void search_book() {
+    char name[MAX_NAME_LENGTH];
+    printf("Enter book name: ");
+    fgets(name, MAX_NAME_LENGTH, stdin);
+    name[strcspn(name, "\n")] = '\0'; // Remove trailing space! ultra imp change or else \n would be considered tooo!!!!
+    int i;
+	for (i = 0; i < num_books; i++) {
+        Book book = books[i];
+        if (strcmp(book.name, name) == 0) {
+            printf("ID\tName\tAuthor\tPublisher\tYear\n");
+            printf("%d\t%s\t%s\t%s\t%d\n", book.id, book.name, book.author, book.publisher, book.year);
+            return;
+        }
+    }
+    printf("Book not found\n");
+}
+
+void delete_book(){
+           int id;
+    printf("Enter book ID: ");
+    scanf("%d", &id);
+    getchar(); // to clear the newline character in the input buffer
+    int i;
+	for (i = 0; i < num_books; i++) {
+        if (books[i].id == id) {
+            // shift all books after the removed book back by one position
+            int j;
+            for (j = i; j < num_books - 1; j++) {
+                books[j] = books[j+1];
+            }
+            num_books--;
+            printf("Book removed successfully\n");
+            return;
+        }
+    }
+    printf("Book not found\n");
+}
+
+void update_book(){
+    int choice,i;
+            printf("Enter the ID of record you want to update: ");
             scanf("%d",&i);
-            for (int j = i; j < i - 1; j++) {
-            books[i] = books[i + 1];
-        }
-        index--;
-            printf("Record deleted.\n");
-            break;
-        }
-       
-        case 3:{
-            char i[200];
-            printf("Enter the name of Book you want to Search: ");
-            fgets(i, sizeof(i), stdin);
-            i[strcspn(i, "\n")] = '\0'; // remove trailing newline character
-            int search_index = -1;
-             for (int j = 0; j < index; j++) {
-            if (strcmp(books[j].name, i) == 0) {
-            search_index = j;
-            break;
-        }
-    }
-
-            if (search_index == -1) {
-            printf("Author not found.\n");
-        }
-            else{
-            printf("Book found at index: %i",search_index);
-        }
-            break;
-        }
-
-        case 4:{
-            int choice;
-            printf("Enter the number of record you want to update: ");
+            i--;
+            printf("Enter the value corresponding to the field that you want to update:\n1. Name \n2. Author \n3. Publisher\n4. Year:");
             scanf("%d",&choice);
+            char s[MAX_AUTHOR_LENGTH];
+            if(choice!=4){
+            printf("Enter New value: ");
+            scanf("%s",s);
+            }
+            switch(choice){
+                case 1:{
+                	int j;
+                    for(j=0;j<strlen(books[i].name);j++){
+                        books[i].name[j]=s[j];
+                    };
+                        break;
+                }
+                case 2:{
+                	int j;
+                    for(j=0;j<strlen(books[i].name);j++){
+                        books[i].author[j]=s[j];
+                    };
+                        break;
+                }
+                case 3:{
+                	int j;
+                    for(j=0;j<strlen(books[i].name);j++){
+                        books[i].publisher[j]=s[j];
+                    };
+                    break;
+                }
+                case 4:{
+                        int years;
+                        printf("Enter the year: ");
+                        scanf("%d",&years);
+                        books[i].year=years;
+                        break;
+                    
+                }
+            }
             
-            break;
-        }
-        case 5:{
-            system("clear"); 
-            printf("Records:\n\n");
-            for (int i = 0; i < index; i++) {
-            printf("Book Name: %s\nAuthor: %s\nDonor: %s\nRecievor: %s\n", books[i].name, books[i].author,books[i].donor,books[i].recievor);
-            printf("\n\n"); // Intendation
-            break;
-    }
-        }
-    }
-    
-    
-    }
-
-
+        
+            printf("\nfield updated!\n");
 }
+
+int main() {
+    int choice;
+    do {
+        printf("\n--Book Donor System--\n");
+        printf("1. Add Book\n");
+        printf("2. List Books\n");
+        printf("3. Search Book\n");
+        printf("4. Delete\n");
+        printf("5. Update\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // to clear the newline character in the input buffer
+        switch (choice) {
+            case 1:
+                add_book();
+                break;
+            case 2:
+                list_books();
+                break;
+            case 3:
+                search_book();
+                break;
+            case 4:
+                delete_book();
+                break;
+            case 5:
+                update_book();
+                break;
+            case 6:
+                printf("Exiting program\n");
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    } while (1); // continue looping while true
+    return 0;
+}
+
