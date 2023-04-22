@@ -142,6 +142,24 @@ void update_book(){
             printf("\nfield updated!\n");
 }
 
+void save_book(){
+    char name[50];
+    FILE *fa;
+    printf("Name of the file to save details:- ");
+    scanf("%s",&name);
+    fa = fopen(name,"w");
+    if (fa == NULL){
+        printf("Error: Could not open  file\n");
+        return 0;
+    }
+    for (int j = 0 ; j < num_books ; j++){
+        fprintf(fa,"%s by %s in %d from %s press \n",books[j].name,books[j].author,books[j].year,books[j].publisher);
+    }
+    printf("Books Details Saved Succesfully with name %s !\n",name);
+    fclose(fa);
+
+}
+
 int main() {
     int choice;
     do {
@@ -151,7 +169,8 @@ int main() {
         printf("3. Search Book\n");
         printf("4. Delete\n");
         printf("5. Update\n");
-        printf("6. Exit\n");
+	printf("6. Save to  File\n");
+        printf("7. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
         getchar(); // to clear the newline character in the input buffer
@@ -172,6 +191,9 @@ int main() {
                 update_book();
                 break;
             case 6:
+                save_book();
+                break;
+            case 7:
                 printf("Exiting program\n");
                 exit(0);
             default:
@@ -180,4 +202,5 @@ int main() {
     } while (1); // continue looping while true
     return 0;
 }
+
 
